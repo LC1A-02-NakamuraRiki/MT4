@@ -1,0 +1,12 @@
+newmtl initialShadingGroup
+illum 4
+Ka 0.06 0.06 0.06
+Kd 0.80 0.80 0.80
+Ks 0.10 0.10 0.10
+Tf 1.00 1.00 1.00
+Ni 1.00
+<<<<<<< HEAD
+map_Kd white1x1.png
+=======
+map_Kd white1x1.png
+>>>>>>> c4a1c95de72924440c42df0ca910f9e8f494f424
