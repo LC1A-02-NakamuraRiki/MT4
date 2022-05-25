@@ -18,7 +18,8 @@ GameScene::~GameScene()
 	safe_delete(modelSkydome);
 	safe_delete(objGround);
 	safe_delete(modelGround);
-	safe_delete(objBom);
+	safe_delete(objBomL);
+	safe_delete(objBomR);
 	safe_delete(modelBom);
 	safe_delete(light);
 }
@@ -65,8 +66,10 @@ void GameScene::Initialize(DirectXCommon *dxCommon, Input *input, Audio *audio)
 	objGround = Object3d::Create(modelGround);
 	objGround->SetScale({ 12.0f, 12.0f, 12.0f });
 	modelBom = Model::CreateFromObject("bom", true);
-	objBom = Object3d::Create(modelBom);
-	objBom->SetPosition({-890.0f,10.0f,0.0f });
+	objBomL = Object3d::Create(modelBom);
+	objBomL->SetPosition({ -200,0,0 });
+	objBomR = Object3d::Create(modelBom);
+	objBomR->SetPosition({ 200,0,0 });
 	//FbxLoader::GetInstanc9e()->LoadModelFromFile(
 	//"cube");
 
@@ -92,34 +95,48 @@ void GameScene::Update()
 	
 	XMFLOAT3 cameraEye = camera->GetEye();
 	XMFLOAT3 cameraTarget = camera->GetTarget();
-	
+	camera->SetEye({ 0,5 ,-300.0f });
+	camera->SetTarget({ 0,0,0});
+	posL = objBomL->GetPosition();
+	posR = objBomR->GetPosition();
 	//リセット
 	if (input->PushKey(DIK_R))
 	{
-		speedY = 15;
-		objBom->SetPosition({ -890.0f,10.0f,0.0f });
+		objBomL->SetPosition({ -200,0,0 });
+		objBomR->SetPosition({ 200,0,0 });
 		bomFlag = false;
-		camera->SetEye({ -890.0f,10.0f ,pos.z - 100.0f });
-		camera->SetTarget({ -890.0f,10.0f ,pos.z });
 	}
 
 	//砲弾処理
-	if (input->PushKey(DIK_SPACE))
+	if (input->TriggerKey(DIK_SPACE))
 	{
 		bomFlag = true;
+		constSpeedXL = (45 * 0.1) / 0.3;
+		speedL = (constSpeedXL - (1.5 * normalForceL)) / 0.4;
+
+		constSpeedXR = (-45 * 0.1) / 0.6;
+		speedR = (constSpeedXR - (1.5 * normalForceR)) / 0.8;
 	}
 	
 	if (bomFlag)
 	{
-		pos = objBom->GetPosition();
-		speedY += gravity;
-		pos.x += speedX;
-		pos.y += speedY;
-		objBom->SetPosition(pos);
-		camera->SetEye({ pos.x,pos.y ,pos.z - 100.0f });
-		camera->SetTarget({ pos.x,pos.y ,pos.z });
+		speedL = 0.95 * speedL;
+		posL.x += speedL;
+		objBomL->SetPosition(posL);
+
+		speedR = 0.95 * speedR;
+		posR.x += speedR;
+		objBomR->SetPosition(posR);
+		if (posL.x > posR.x)
+		{
+			speedR += speedL;
+			speedL -= speedR;
+			int a = 0;
+		
+		}
 	}
 	
+
 	// オブジェクト移動
 	//if (input->PushKey(DIK_UP) || input->PushKey(DIK_DOWN) || input->PushKey(DIK_RIGHT) || input->PushKey(DIK_LEFT) || input->PushKey(DIK_SPACE) || input->PushKey(DIK_LCONTROL))
 	//{
@@ -183,7 +200,8 @@ void GameScene::Update()
 	camera->Update();
 	objSkydome->Update();
 	objGround->Update();
-	objBom->Update();
+	objBomL->Update();
+	objBomR->Update();
 	light->Update();
 }
 
@@ -215,10 +233,10 @@ void GameScene::Draw()
 	//-------------------------------------------------------------//
 
 	//playerObj->Draw();
-	objSkydome->Draw();
-	objGround->Draw();
-	objBom->Draw();
-	
+	//objSkydome->Draw();
+	//objGround->Draw();
+	objBomL->Draw();
+	objBomR->Draw();
 	//-------------------------------------------------------------//
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
@@ -233,9 +251,11 @@ void GameScene::Draw()
 	//-------------------------------------------------------------//
 	debugText.Print(20, 30, 2.0f, "Space : Start");
 	debugText.Print(20, 80, 2.0f, "R : ReStart");
-	debugText.Print(20, 130, 1.5f, "bom Pos  X:%f Y:%f Z:%f", pos.x, pos.y, pos.z);
-	debugText.Print(20, 160, 1.5f, "bom speed  X:%f Y:%f", speedX, speedY);
+	/*debugText.Print(20, 130, 1.5f, "bom Pos  X:%f Y:%f Z:%f", posL.x, pos.y, pos.z);
+	debugText.Print(20, 160, 1.5f, "bom speed  X:%f", speed);
 
+	debugText.Print(20, 130, 1.5f, "bom Pos  X:%f Y:%f Z:%f", pos.x, pos.y, pos.z);
+	debugText.Print(20, 160, 1.5f, "bom speed  X:%f", speed);*/
 	//-------------------------------------------------------------//
 	// デバッグテキストの描画
 	debugText.DrawAll(cmdList);

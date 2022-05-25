@@ -80,7 +80,8 @@ private: // メンバ変数
 	Object3d *objGround = nullptr;
 
 	Model *modelBom = nullptr;
-	Object3d *objBom = nullptr;
+	Object3d *objBomL = nullptr;
+	Object3d* objBomR = nullptr;
 	ParticleManager *particle3d = nullptr;
 
 	/*Object3d *playerObj = nullptr;
@@ -91,11 +92,19 @@ private: // メンバ変数
 	Triangle triangle;
 	Ray ray;*/
 
-	float collision;
 
-	const float speedX = 9;
-	float speedY = 15;
-	const float gravity = -9.8 / 60.0f;
-	XMFLOAT3 pos = { 0,0,0 };
 	bool bomFlag = false;
+	//左
+	float constSpeedXL = 0;//力積の初速度
+	const float normalForceL = 0.4 * 9.8 - 0;//垂直抗力
+	float speedL = 0;
+	XMFLOAT3 posL = { 0,0,0 };
+	
+
+	//右
+	float constSpeedXR = 0;//力積の初速度
+	const float normalForceR = 0.4 * 9.8 - 0;//垂直抗力
+	float speedR = 0;
+	XMFLOAT3 posR = { 0,0,0 };
+	
 };
